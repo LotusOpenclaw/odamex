@@ -93,6 +93,9 @@ public:
 
 	private:
 		table_iterator m_it;
+		// FIXME: use a proxy object or something instead, because this is completely not
+		// thread safe, but also breaks with just something like
+		// somefunc(it->first, (it+1)->first)
 		mutable std::optional<value_type> m_value;
 	};
 
