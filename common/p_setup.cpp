@@ -2108,7 +2108,7 @@ void P_SetupLevel (const char *lumpname, int position)
 		if (W_LumpLength(lumpnum + ML_REJECT) < ((unsigned int)ceil((float)(numsectors * numsectors / 8))))
 		{
 			DPrintFmt("Reject matrix is not valid and will be ignored.\n");
-			rejectempty = true;
+			// rejectempty = true;
 		}
 	}
 	P_GroupLines ();
