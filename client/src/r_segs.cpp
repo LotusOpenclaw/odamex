@@ -198,9 +198,9 @@ static inline void R_BlastMaskedSegColumn(void (*drawfunc)())
 		while (!post->end())
 		{
 			// calculate unclipped screen coordinates for post
-			const int topscreen = sprtopscreen + spryscale * post->topdelta + 1;
+			const int topscreen = sprtopscreen + spryscale * post->topdelta;
 
-			dcol.yl = (topscreen + FRACUNIT) >> FRACBITS;
+			dcol.yl = (topscreen) >> FRACBITS;
 			dcol.yh = (topscreen + spryscale * post->length) >> FRACBITS;
 
 			dcol.yl = MAX(dcol.yl, mceilingclip[dcol.x] + 1);
@@ -478,7 +478,7 @@ void R_RenderSolidSegRange(int start, int stop)
 		for (int x = start; x <= stop; x++)
 		{
 			const int top = MAX(ceilingclip[x], 0);
-			const int bottom = MIN(MIN(walltopf[x], floorclip[x]) - 1, viewheight - 1);
+			const int bottom = MIN(MIN(walltopf[x], floorclip[x]), viewheight);
 
 			if (top <= bottom)
 			{
