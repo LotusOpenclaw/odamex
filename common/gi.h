@@ -140,7 +140,13 @@ typedef struct gameinfo_s
 		, bigFontLumpStart(1)
 		, smallFontPattern("STCFN%03d")
 		, smallFontLumpStart(33)
-	{}
+	{
+		// Default lock key colors (Doom-like baseline). Game-specific ID
+		// setup can override these when gameinfo is defined.
+		defaultAutomapColors.LockedBlueColor = "00 00 ff";
+		defaultAutomapColors.LockedYellowColor = "ff ff 00";
+		defaultAutomapColors.LockedRedColor = "ff 00 00";
+	}
 
 } gameinfo_t;
 
