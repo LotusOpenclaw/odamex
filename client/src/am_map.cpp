@@ -644,6 +644,12 @@ void AM_initColors(const bool overlayed)
 		gameinfo.currentAutomapColors.XHairColor = AM_GetColorFromString(palette_colors, am_ovxhaircolor.str());
 		gameinfo.currentAutomapColors.NotSeenColor = AM_GetColorFromString(palette_colors, am_ovnotseencolor.str());
 		gameinfo.currentAutomapColors.LockedColor = AM_GetColorFromString(palette_colors, am_ovlockedcolor.str());
+		gameinfo.currentAutomapColors.LockedBlueColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedBlueColor);
+		gameinfo.currentAutomapColors.LockedYellowColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedYellowColor);
+		gameinfo.currentAutomapColors.LockedRedColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedRedColor);
 		gameinfo.currentAutomapColors.ExitColor = AM_GetColorFromString(palette_colors, am_ovexitcolor.str());
 		gameinfo.currentAutomapColors.TeleportColor =
 		    AM_GetColorFromString(palette_colors, am_ovteleportcolor.str());
@@ -669,6 +675,12 @@ void AM_initColors(const bool overlayed)
 		gameinfo.currentAutomapColors.XHairColor = AM_GetColorFromString(palette_colors, am_xhaircolor.str());
 		gameinfo.currentAutomapColors.NotSeenColor = AM_GetColorFromString(palette_colors, am_notseencolor.str());
 		gameinfo.currentAutomapColors.LockedColor = AM_GetColorFromString(palette_colors, am_lockedcolor.str());
+		gameinfo.currentAutomapColors.LockedBlueColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedBlueColor);
+		gameinfo.currentAutomapColors.LockedYellowColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedYellowColor);
+		gameinfo.currentAutomapColors.LockedRedColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedRedColor);
 		gameinfo.currentAutomapColors.ExitColor = AM_GetColorFromString(palette_colors, am_exitcolor.str());
 		gameinfo.currentAutomapColors.TeleportColor = AM_GetColorFromString(palette_colors, am_teleportcolor.str());
 		{
@@ -703,6 +715,12 @@ void AM_initColors(const bool overlayed)
 			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.FDWallColor);
 		gameinfo.currentAutomapColors.LockedColor =
 			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedColor);
+		gameinfo.currentAutomapColors.LockedBlueColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedBlueColor);
+		gameinfo.currentAutomapColors.LockedYellowColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedYellowColor);
+		gameinfo.currentAutomapColors.LockedRedColor =
+			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.LockedRedColor);
 		gameinfo.currentAutomapColors.CDWallColor =
 			AM_GetColorFromString(palette_colors, gameinfo.defaultAutomapColors.CDWallColor);
 		gameinfo.currentAutomapColors.ThingColor =
@@ -1003,6 +1021,64 @@ struct
 	std::array<uint8_t, 3> multidoor;
 } doorColors;
 
+static std::array<uint8_t, 3> AM_ToRGB(const am_color_t& color)
+{
+	return {
+		color.rgb.getr(),
+		color.rgb.getg(),
+		color.rgb.getb()
+	};
+}
+
+enum class AM_lockeddoor_color_t
+{
+	Blue,
+	Yellow,
+	RedOrGreen,
+	Multi,
+	CeilingDelta,
+	LockedDefault,
+};
+
+static void AM_SetLockedDoorRGB(const AM_lockeddoor_color_t type, int& r, int& g, int& b)
+{
+	const bool isHeretic = gameinfo.gametype == GAMETYPE_HERETIC;
+	const auto setColor = [&r, &g, &b](const std::array<uint8_t, 3>& c)
+	{
+		r = c[0];
+		g = c[1];
+		b = c[2];
+	};
+
+	switch (type)
+	{
+		case AM_lockeddoor_color_t::Blue:
+			setColor(isHeretic ? AM_ToRGB(gameinfo.currentAutomapColors.LockedBlueColor)
+			                   : doorColors.bluedoor);
+			break;
+		case AM_lockeddoor_color_t::Yellow:
+			setColor(isHeretic ? AM_ToRGB(gameinfo.currentAutomapColors.LockedYellowColor)
+			                   : doorColors.yellowdoor);
+			break;
+		case AM_lockeddoor_color_t::RedOrGreen:
+			setColor(isHeretic ? AM_ToRGB(gameinfo.currentAutomapColors.LockedRedColor)
+			                   : doorColors.reddoor);
+			break;
+		case AM_lockeddoor_color_t::Multi:
+			setColor(doorColors.multidoor);
+			break;
+		case AM_lockeddoor_color_t::CeilingDelta:
+			r = gameinfo.currentAutomapColors.CDWallColor.rgb.getr();
+			g = gameinfo.currentAutomapColors.CDWallColor.rgb.getg();
+			b = gameinfo.currentAutomapColors.CDWallColor.rgb.getb();
+			break;
+		case AM_lockeddoor_color_t::LockedDefault:
+			r = gameinfo.currentAutomapColors.LockedColor.rgb.getr();
+			g = gameinfo.currentAutomapColors.LockedColor.rgb.getg();
+			b = gameinfo.currentAutomapColors.LockedColor.rgb.getb();
+			break;
+	}
+}
 
 //
 // Updates on Game Tick
@@ -1065,17 +1141,18 @@ void AM_Ticker()
 			}
 		};
 
-		static constexpr std::array<uint8_t, 3> red = {255, 0, 0};
-		static constexpr std::array<uint8_t, 3> blue = {0, 0, 255};
-		static constexpr std::array<uint8_t, 3> yellow = {255, 255, 0};
+		const std::array<uint8_t, 3> keyBlue = AM_ToRGB(gameinfo.currentAutomapColors.LockedBlueColor);
+		const std::array<uint8_t, 3> keyYellow = AM_ToRGB(gameinfo.currentAutomapColors.LockedYellowColor);
+		const std::array<uint8_t, 3> keyRedClass = AM_ToRGB(gameinfo.currentAutomapColors.LockedRedColor);
 
-		doorColors.reddoor    = pulse(red);
-		doorColors.bluedoor   = pulse(blue);
-		doorColors.yellowdoor = pulse(yellow);
+		doorColors.reddoor    = pulse(keyRedClass);
+		doorColors.bluedoor   = pulse(keyBlue);
+		doorColors.yellowdoor = pulse(keyYellow);
 
-		static constexpr std::array<std::array<uint8_t,3>, 3> seq = {
-			red, blue, yellow
-		};
+		const bool isHeretic = gameinfo.gametype == GAMETYPE_HERETIC;
+		const std::array<std::array<uint8_t, 3>, 3> seq = isHeretic
+		    ? std::array<std::array<uint8_t, 3>, 3>{keyBlue, keyYellow, keyRedClass}
+		    : std::array<std::array<uint8_t, 3>, 3>{keyRedClass, keyBlue, keyYellow};
 
 		const int segment = (lockglow / 30) % 3;
 		const int next    = (segment + 1) % 3;
@@ -1558,63 +1635,30 @@ void AM_drawWalls()
 							case zk_blue:
 							case zk_blue_skull:
 							case zk_bluex:
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 0; g = 0; b = 255;
-								}
-								else
-								{
-									r = doorColors.bluedoor[0];
-									g = doorColors.bluedoor[1];
-									b = doorColors.bluedoor[2];
-								}
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Blue, r, g, b);
 								break;
 							case zk_yellow_card:
 							case zk_yellow:
 							case zk_yellow_skull:
 							case zk_yellowx:
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 255; g = 255; b = 0;
-								}
-								else
-								{
-									r = doorColors.yellowdoor[0];
-									g = doorColors.yellowdoor[1];
-									b = doorColors.yellowdoor[2];
-								}
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Yellow, r, g, b);
 								break;
 							case zk_red_card:
 							case zk_red:
 							case zk_red_skull:
 							case zk_redx:
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 0x4c; g = 0x33; b = 0x11;
-								}
-								else
-								{
-									r = doorColors.reddoor[0];
-									g = doorColors.reddoor[1];
-									b = doorColors.reddoor[2];
-								}
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::RedOrGreen, r, g, b);
 								break;
 							case zk_all:
 							case zk_any:
 							case zk_each_color:
-								r = doorColors.multidoor[0];
-								g = doorColors.multidoor[1];
-								b = doorColors.multidoor[2];
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Multi, r, g, b);
 								break;
 							case zk_none:
-								r = gameinfo.currentAutomapColors.CDWallColor.rgb.getr();
-								g = gameinfo.currentAutomapColors.CDWallColor.rgb.getg();
-								b = gameinfo.currentAutomapColors.CDWallColor.rgb.getb();
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::CeilingDelta, r, g, b);
 								break;
 							default:
-								r = gameinfo.currentAutomapColors.LockedColor.rgb.getr();
-								g = gameinfo.currentAutomapColors.LockedColor.rgb.getg();
-								b = gameinfo.currentAutomapColors.LockedColor.rgb.getb();
+								AM_SetLockedDoorRGB(AM_lockeddoor_color_t::LockedDefault, r, g, b);
 								break;
 						}
 
@@ -1626,54 +1670,22 @@ void AM_drawWalls()
 					if (P_IsCompatibleLockedDoorLine(line.special))
 					{
 						// NES - Locked doors glow from a predefined color to either blue,
-						// yellow, or red.
+						// yellow, or red/green.
 						if (P_IsCompatibleMultiKeyDoorLine(line.special))
 						{
-							r = doorColors.multidoor[0];
-							g = doorColors.multidoor[1];
-							b = doorColors.multidoor[2];
+							AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Multi, r, g, b);
+						}
+						else if (P_IsCompatibleBlueDoorLine(line.special))
+						{
+							AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Blue, r, g, b);
+						}
+						else if (P_IsCompatibleYellowDoorLine(line.special))
+						{
+							AM_SetLockedDoorRGB(AM_lockeddoor_color_t::Yellow, r, g, b);
 						}
 						else
 						{
-							if (P_IsCompatibleBlueDoorLine(line.special))
-							{
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 0; g = 0; b = 255;
-								}
-								else
-								{
-									r = doorColors.bluedoor[0];
-									g = doorColors.bluedoor[1];
-									b = doorColors.bluedoor[2];
-								}
-							}
-							else if (P_IsCompatibleYellowDoorLine(line.special))
-							{
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 255; g = 255; b = 0;
-								}
-								else
-								{
-									r = doorColors.yellowdoor[0];
-									g = doorColors.yellowdoor[1];
-									b = doorColors.yellowdoor[2];
-								}
-							}
-							else
-							{
-								if (gameinfo.gametype == GAMETYPE_HERETIC)
-								{
-									r = 0x4c; g = 0x33; b = 0x11;
-								}
-								else
-								{
-									r = doorColors.reddoor[0];
-									g = doorColors.reddoor[1];
-									b = doorColors.reddoor[2];
-								}
-							}
+							AM_SetLockedDoorRGB(AM_lockeddoor_color_t::RedOrGreen, r, g, b);
 						}
 
 						AM_drawMline(&l, AM_BestColor(pal->basecolors, r, g, b));

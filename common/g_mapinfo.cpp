@@ -1645,6 +1645,9 @@ struct MapInfoDataSetter<automap_dummy>
 			{ "xhaircolor", &MIType_String, &gameinfo.defaultAutomapColors.XHairColor  },
 			{ "notseencolor", &MIType_String, &gameinfo.defaultAutomapColors.NotSeenColor  },
 			{ "lockedcolor", &MIType_String, &gameinfo.defaultAutomapColors.LockedColor  },
+			{ "lockedbluecolor", &MIType_String, &gameinfo.defaultAutomapColors.LockedBlueColor  },
+			{ "lockedyellowcolor", &MIType_String, &gameinfo.defaultAutomapColors.LockedYellowColor  },
+			{ "lockedredcolor", &MIType_String, &gameinfo.defaultAutomapColors.LockedRedColor  },
 			{ "almostbackgroundcolor", &MIType_String, &gameinfo.defaultAutomapColors.AlmostBackground  },
 			{ "intrateleportcolor", &MIType_String, &gameinfo.defaultAutomapColors.TeleportColor  },
 			{ "exitcolor", &MIType_String, &gameinfo.defaultAutomapColors.ExitColor  }

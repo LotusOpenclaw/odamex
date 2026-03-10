@@ -58,6 +58,9 @@ typedef struct am_colors_s
 	am_color_t XHairColor;
 	am_color_t NotSeenColor;
 	am_color_t LockedColor;
+	am_color_t LockedBlueColor;
+	am_color_t LockedYellowColor;
+	am_color_t LockedRedColor;
 	am_color_t AlmostBackground;
 	am_color_t TeleportColor;
 	am_color_t ExitColor;
@@ -83,6 +86,9 @@ typedef struct am_default_colors_s
 	std::string XHairColor;
 	std::string NotSeenColor;
 	std::string LockedColor;
+	std::string LockedBlueColor;
+	std::string LockedYellowColor;
+	std::string LockedRedColor;
 	std::string AlmostBackground;
 	std::string TeleportColor;
 	std::string ExitColor;
