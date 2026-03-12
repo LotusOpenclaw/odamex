@@ -29,6 +29,7 @@
 #include "v_text.h"
 
 extern byte* Ranges;
+EXTERN_CVAR(hud_transparency)
 
 namespace hud {
 
@@ -260,6 +261,16 @@ void DrawShadowedText(int x, int y, const float scale,
 	    (shadow_color >= 0 && shadow_color < NUM_TEXT_COLORS) ? shadow_color : CR_BLACK;
 	const translationref_t saved_colormap = V_ColorMap;
 	const int saved_color_fill = V_ColorFill;
+	const float saved_hud_transparency = ::hud_transparency;
+	if (!force_opaque)
+	{
+		float text_transparency = saved_hud_transparency * 0.5f;
+		if (text_transparency < 0.0f)
+			text_transparency = 0.0f;
+		else if (text_transparency > 1.0f)
+			text_transparency = 1.0f;
+		::hud_transparency.ForceSet(text_transparency);
+	}
 
 	int draw_x = x;
 	int glyph_index = 0;
@@ -324,6 +335,7 @@ void DrawShadowedText(int x, int y, const float scale,
 
 	V_ColorMap = saved_colormap;
 	V_ColorFill = saved_color_fill;
+	::hud_transparency.ForceSet(saved_hud_transparency);
 }
 
 
